@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODE-SWITCHING</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --bg-color: #f8f9fa;
+            --text-color: #2b2d42;
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .translator-box {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .translation-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .translation-area {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-section, .output-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .section-header label {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .textarea-container {
+            position: relative;
+            flex-grow: 1;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: none;
+            transition: border-color 0.3s ease;
+            background-color: white;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .controls {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #e9ecef;
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #dee2e6;
+        }
+
+        .loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .loading i {
+            margin-right: 8px;
+            color: var(--primary-color);
+        }
+
+        .character-count {
+            font-size: 0.8rem;
+            color: #666;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .examples {
+            margin-top: 2rem;
+            padding: 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .examples h3 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .example-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .example-chip {
+            padding: 8px 16px;
+            background-color: #e9ecef;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .example-chip:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CODE-SWITCHING</h1>
+            <p>Language Detection And Translation</p>
+        </div>
+
+        <div class="translator-box">
+            <div class="translation-area">
+                <div class="input-section">
+                    <div class="section-header">
+                        <label for="input-text">Enter Mixed(Hindi-English) Text</label>
+                        <div class="character-count" id="input-count">0/500</div>
+                    </div>
+                    <div class="textarea-container">
+                        <textarea 
+                            id="input-text" 
+                            placeholder="Type or paste your text here..."
+                            maxlength="500"
+                            oninput="updateCharCount(this, 'input-count')"></textarea>
+                    </div>
+                </div>
+
+                <div class="output-section">
+                    <div class="section-header">
+                        <label for="output-text">English Translation</label>
+                        <div class="character-count" id="output-count">0/500</div>
+                    </div>
+                    <div class="textarea-container">
+                        <textarea 
+                            id="output-text" 
+                            placeholder="Translation will appear here..."
+                            readonly></textarea>
+                        <div class="loading" id="loading">
+                            <i class="fas fa-spinner fa-spin"></i> Translating...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-primary" onclick="translateText()">
+                    <i class="fas fa-language"></i> Translate
+                </button>
+                <button class="btn btn-secondary" onclick="clearText()">
+                    <i class="fas fa-trash-alt"></i> Clear
+                </button>
+            </div>
+        </div>
+
+        <div class="examples">
+            <h3>Example Phrases</h3>
+            <div class="example-chips">
+                <div class="example-chip" onclick="setExample('हम लोग weekend पर एक short trip plan कर रहे हैं ताकि हम थोड़ा relax कर सकें और नए places explore कर सकें।')">हम लोग weekend पर एक short trip plan कर रहे हैं ताकि हम थोड़ा relax कर सकें और नए places explore कर सकें।</div>
+                <div class="example-chip" onclick="setExample('कल हम going to the mall for shopping.')">कल हम going to the mall for shopping.</div>
+                <div class="example-chip" onclick="setExample('हम are planning एक short trip over the weekend ताकि हम थोड़ा relax कर सकें और new places explore कर सकें।')">हम are planning एक short trip over the weekend ताकि हम थोड़ा relax कर सकें और new places explore कर सकें।</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateCharCount(textarea, counterId) {
+            const count = textarea.value.length;
+            const max = textarea.maxLength;
+            document.getElementById(counterId).textContent = `${count}/${max}`;
+        }
+
+        function setExample(text) {
+            const inputText = document.getElementById('input-text');
+            inputText.value = text;
+            updateCharCount(inputText, 'input-count');
+        }
+
+        function clearText() {
+            document.getElementById('input-text').value = '';
+            document.getElementById('output-text').value = '';
+            document.getElementById('input-count').textContent = '0/500';
+            document.getElementById('output-count').textContent = '0/500';
+        }
+
+        function translateText() {
+            const inputText = document.getElementById('input-text').value;
+            const loadingDiv = document.getElementById('loading');
+            const outputText = document.getElementById('output-text');
+
+            if (!inputText.trim()) {
+                alert('Please enter text to translate');
+                return;
+            }
+
+            loadingDiv.style.display = 'flex';
+            outputText.value = '';
+
+            fetch('/translate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: inputText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingDiv.style.display = 'none';
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    outputText.value = data.translation;
+                    updateCharCount(outputText, 'output-count');
+                }
+            })
+            .catch(error => {
+                loadingDiv.style.display = 'none';
+                alert('Error during translation: ' + error);
+            });
+        }
+    </script>
+</body>
+</html>
